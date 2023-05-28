@@ -8,7 +8,7 @@ class DtoxSpec extends Specification {
     def 'test for simple object'() {
         when:
         def result = Dtox.generate(SimpleDto) {
-            field1 'a', 'b'
+            field1 'a', 'b', nullable: true
             field2 'c', 'd'
         }
         def d = 1
