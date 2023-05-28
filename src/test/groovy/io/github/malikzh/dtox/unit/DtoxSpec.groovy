@@ -108,4 +108,42 @@ class DtoxSpec extends Specification {
         result[1].field1 == 'b'
         result[1].field2 != null
     }
+
+    def 'nullable fields with simple dto'() {
+        when:
+        List<SimpleDto> result = dtox(SimpleDto, nullable: true) {
+            field1 'str1', 'str2',
+                    nullable: true
+
+            field2 4,
+                    nullable: true
+        }
+
+        then:
+        noExceptionThrown()
+
+        and: 'check size'
+        result.size() == 7
+
+        and: 'check data'
+        result[0] == null
+
+        result[1].field1 == null
+        result[1].field2 == null
+
+        result[2].field1 == null
+        result[2].field2 == 4
+
+        result[3].field1 == 'str1'
+        result[3].field2 == null
+
+        result[4].field1 == 'str1'
+        result[4].field2 == 4
+
+        result[5].field1 == 'str2'
+        result[5].field2 == null
+
+        result[6].field1 == 'str2'
+        result[6].field2 == 4
+    }
 }

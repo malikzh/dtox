@@ -24,6 +24,10 @@ final class Dtox {
             }
         }
 
+        if (attrs['nullable']) {
+            result.push(null)
+        }
+
         return result
     }
 
@@ -57,6 +61,10 @@ final class Dtox {
         }
 
         // Handle variants
+        if (field.value.attributes['nullable'] && !field.value.variants.any { it == null }) {
+            field.value.variants.push(null)
+        }
+
         for (variant in field.value.variants) {
             data[field.key] = variant
 
