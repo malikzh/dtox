@@ -109,6 +109,7 @@ class DtoxSpec extends Specification {
         result[1].field2 != null
     }
 
+    // check nullable
     def 'nullable fields with simple dto'() {
         when:
         List<SimpleDto> result = dtox(SimpleDto, nullable: true) {
@@ -174,5 +175,33 @@ class DtoxSpec extends Specification {
 
         result[3].field1 == 'b'
         result[3].field2 != null && result[1].field2.field2 == 4
+    }
+
+    // Check excludeIf
+    def 'check excludeIf with simple dto'() {
+        when:
+        List<SimpleDto> result = dtox(SimpleDto, excludeIf: { SimpleDto it -> it.field2 == 6 }) {
+            field1 'str1', 'str2'
+            field2 4, 5, 6
+        }
+
+        then:
+        noExceptionThrown()
+
+        and:
+        result.size() == 4
+
+        and: 'check data'
+        result[0].field1 == 'str1'
+        result[0].field2 == 4
+
+        result[1].field1 == 'str1'
+        result[1].field2 == 5
+
+        result[2].field1 == 'str2'
+        result[2].field2 == 4
+
+        result[3].field1 == 'str2'
+        result[3].field2 == 5
     }
 }

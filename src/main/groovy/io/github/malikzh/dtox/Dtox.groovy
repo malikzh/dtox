@@ -20,7 +20,9 @@ final class Dtox {
 
         generateCombinations(clazz, delegate.fields.entrySet().toList()) { cl, data ->
             builder(cl, data).tap {
-                result.add(it)
+                if (!attrs['excludeIf'](it)) {
+                    result.add(it)
+                }
             }
         }
 
