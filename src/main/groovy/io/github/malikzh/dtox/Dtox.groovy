@@ -58,15 +58,15 @@ final class Dtox {
 
             if (field.value.attributes['nullable']) {
                 data[field.key] = null
-                builder(clazz, data)
+                builder(clazz, data, excludeIf)
             }
 
             generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map, excludeFunc = null ->
                 def fieldDto = fieldBuilder(c, map)
 
-                if (!excludeIf(fieldDto) && (excludeFunc == null || !excludeFunc(fieldDto))) {
+                if (!excludeIf(fieldDto)) {
                     data[field.key] = fieldDto
-                    builder(clazz, data)
+                    builder(clazz, data, excludeFunc)
                 }
             })
             return
