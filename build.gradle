@@ -43,22 +43,22 @@ jacocoTestReport {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from(components.java)
-        }
+//        mavenJava(MavenPublication) {
+//            from(components.java)
+//        }
         gpr(MavenPublication) {
             from(components.java)
         }
     }
     repositories {
-        maven {
-            name = "OSSRH"
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
-        }
+//        maven {
+//            name = "OSSRH"
+//            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            credentials {
+//                username = System.getenv("MAVEN_USERNAME")
+//                password = System.getenv("MAVEN_PASSWORD")
+//            }
+//        }
 
         maven {
             name = "GitHubPackages"
