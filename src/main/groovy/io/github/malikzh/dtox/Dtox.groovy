@@ -18,9 +18,9 @@ final class Dtox {
 
         def result = []
 
-        generateCombinations(clazz, delegate.fields.entrySet().toList()) { cl, data ->
+        generateCombinations(clazz, delegate.fields.entrySet().toList()) { cl, data, excludeFunc = null ->
             builder(cl, data).tap {
-                if (!attrs['excludeIf'](it)) {
+                if (!attrs['excludeIf'](it) && (excludeFunc == null || !excludeFunc(it))) {
                     result.add(it)
                 }
             }
@@ -61,10 +61,10 @@ final class Dtox {
                 builder(clazz, data)
             }
 
-            generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map ->
+            generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map, excludeFunc = null ->
                 def fieldDto = fieldBuilder(c, map)
 
-                if (!excludeIf(fieldDto)) {
+                if (!excludeIf(fieldDto) && (excludeFunc == null || !excludeFunc(fieldDto))) {
                     data[field.key] = fieldDto
                     builder(clazz, data)
                 }
@@ -77,13 +77,15 @@ final class Dtox {
             field.value.variants.push(null)
         }
 
+        def excludeIf = field.value.attributes['excludeIf']
+
         for (variant in field.value.variants) {
             data[field.key] = variant
 
             if (fields.size() > 1) {
                 generateCombinations(clazz, fields[1..-1], builder, data)
             } else {
-                builder(clazz, data)
+                builder(clazz, data, excludeIf)
             }
         }
     }

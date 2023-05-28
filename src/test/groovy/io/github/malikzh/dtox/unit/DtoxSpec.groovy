@@ -233,4 +233,32 @@ class DtoxSpec extends Specification {
         result[3].field1 == 'b'
         result[3].field2.field2 == 5
     }
+
+    def 'check excludeIf for simple fields'() {
+        when:
+        List<SimpleDto> result = dtox(SimpleDto) {
+            field1 'str1', 'str2'
+            field2 4, 5, 8,
+                    excludeIf: {SimpleDto dto -> dto.field2 == 8}
+        }
+
+        then:
+        noExceptionThrown()
+
+        and:
+        result.size() == 4
+
+        and: 'check data'
+        result[0].field1 == 'str1'
+        result[0].field2 == 4
+
+        result[1].field1 == 'str1'
+        result[1].field2 == 5
+
+        result[2].field1 == 'str2'
+        result[2].field2 == 4
+
+        result[3].field1 == 'str2'
+        result[3].field2 == 5
+    }
 }
