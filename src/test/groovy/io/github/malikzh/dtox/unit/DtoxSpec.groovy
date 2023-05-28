@@ -1,5 +1,6 @@
 package io.github.malikzh.dtox.unit
 
+import io.github.malikzh.dtox.dto.ComplexDto
 import io.github.malikzh.dtox.dto.SimpleDto
 import io.github.malikzh.dtox.enums.SampleEnum
 import spock.lang.Specification
@@ -54,5 +55,34 @@ class DtoxSpec extends Specification {
         result[7].field1 == 'str2'
         result[7].field2 == 5
         result[7].field3 == SampleEnum.VALUE_2
+    }
+
+    def 'complex dto object'() {
+        when:
+        List<ComplexDto> result = dtox(ComplexDto) {
+            field1 'a', 'b'
+            field2 {
+                field2 4, 5
+            }
+        }
+
+        then:
+        noExceptionThrown()
+
+        and: 'check size'
+        result.size() == 4
+
+        and: 'check data'
+        result[0].field1 == 'a'
+        result[0].field2.field2 == 4
+
+        result[1].field1 == 'a'
+        result[1].field2.field2 == 5
+
+        result[2].field1 == 'b'
+        result[2].field2.field2 == 4
+
+        result[3].field1 == 'b'
+        result[3].field2.field2 == 5
     }
 }
