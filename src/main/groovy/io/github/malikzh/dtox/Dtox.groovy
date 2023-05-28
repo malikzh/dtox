@@ -11,14 +11,14 @@ final class Dtox {
         definition.setResolveStrategy(Closure.DELEGATE_ONLY)
         definition()
 
-        return generateCombinations(delegate.fields.entrySet().toList(), builderFunction())
+        generateCombinations(delegate.fields.entrySet().toList(), builderFunction())
+
+        return []
     }
 
-    private static List<Object> generateCombinations(List<Entry<String, Field>> fields, Closure builder, data = [:]) {
-        List<Object> combinations = []
-
+    private static void generateCombinations(List<Entry<String, Field>> fields, Closure builder, data = [:]) {
         if (fields.isEmpty()) {
-            return combinations
+            return
         }
 
         def field = fields[0]
@@ -27,10 +27,10 @@ final class Dtox {
         if (field.value.variants.size() == 1 && field.value.variants[0] instanceof DtoxDelegate) {
             DtoxDelegate delegate = field.value.variants[0] as DtoxDelegate
             generateCombinations(delegate.fields.entrySet().toList(), { clazz, map ->
-                builder(null, data)
+                data[field.key] = builder(null, data)
                 println('subvar: ' + map)
             })
-            return []
+            return
         }
 
         // Handle variants
@@ -38,13 +38,11 @@ final class Dtox {
             data[field.key] = variant
 
             if (fields.size() > 1) {
-                combinations += generateCombinations(fields[1..-1], builder, data)
+                generateCombinations(fields[1..-1], builder, data)
             } else {
-                combinations.push(builder(null, data))
+                builder(null, data)
             }
         }
-
-        return combinations
     }
 
     static def ii = 1
