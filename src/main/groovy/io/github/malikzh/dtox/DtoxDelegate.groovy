@@ -26,6 +26,7 @@ final class DtoxDelegate {
 
             closure.setResolveStrategy(Closure.DELEGATE_ONLY)
             closure.setDelegate(delegate)
+            closure()
 
             return [delegate]
         }
