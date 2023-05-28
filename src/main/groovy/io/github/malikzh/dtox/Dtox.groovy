@@ -53,6 +53,11 @@ final class Dtox {
 
             def fieldBuilder = field.value.attributes['builder']
 
+            if (field.value.attributes['nullable']) {
+                data[field.key] = null
+                builder(clazz, data)
+            }
+
             generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map ->
                 data[field.key] = fieldBuilder(c, map)
                 builder(clazz, data)

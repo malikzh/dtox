@@ -146,4 +146,33 @@ class DtoxSpec extends Specification {
         result[6].field1 == 'str2'
         result[6].field2 == 4
     }
+
+    def 'check nullable for complex dto'() {
+        when:
+        List<ComplexDto> result = dtox(ComplexDto) {
+            field1 'a', 'b'
+            field2 (nullable: true) {
+                field2 4
+            }
+        }
+
+        then:
+        noExceptionThrown()
+
+        and: 'check size'
+        result.size() == 4
+
+        and: 'check data'
+        result[0].field1 == 'a'
+        result[0].field2 == null
+
+        result[1].field1 == 'a'
+        result[1].field2 != null && result[1].field2.field2 == 4
+
+        result[2].field1 == 'b'
+        result[2].field2 == null
+
+        result[3].field1 == 'b'
+        result[3].field2 != null && result[1].field2.field2 == 4
+    }
 }
