@@ -3,7 +3,7 @@ package io.github.malikzh.dtox
 import java.util.Map.Entry
 
 final class Dtox {
-    static List<Object> generate(Map<String, Object> attributes, Class clazz, Closure definition) {
+    static List<Object> dtox(Map<String, Object> attributes, Class clazz, Closure definition) {
         Objects.requireNonNull(clazz, 'Class must be not null!')
 
         def delegate = new DtoxDelegate()
