@@ -37,7 +37,7 @@ final class Dtox {
         return dtox([:], clazz, definition)
     }
 
-    private static void generateCombinations(Class clazz, List<Entry<String, Field>> fields, Closure builder, data = [:]) {
+    private static void generateCombinations(Class clazz, List<Entry<String, Field>> fields, Closure builder, Map<String, Object> data = [:]) {
         if (fields.isEmpty()) {
             builder(clazz, data)
             return
@@ -54,6 +54,7 @@ final class Dtox {
             assert fieldClass != null: "Class '${clazz.name}' doesn't have field '$field.key'"
 
             def fieldBuilder = field.value.attributes['builder']
+            def excludeIf = field.value.attributes['excludeIf']
 
             if (field.value.attributes['nullable']) {
                 data[field.key] = null
@@ -61,8 +62,12 @@ final class Dtox {
             }
 
             generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map ->
-                data[field.key] = fieldBuilder(c, map)
-                builder(clazz, data)
+                def fieldDto = fieldBuilder(c, map)
+
+                if (!excludeIf(fieldDto)) {
+                    data[field.key] = fieldDto
+                    builder(clazz, data)
+                }
             })
             return
         }
