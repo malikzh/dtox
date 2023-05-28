@@ -20,7 +20,7 @@ final class Dtox {
 
         generateCombinations(clazz, delegate.fields.entrySet().toList()) { cl, data ->
             builder(cl, data).tap {
-                result.push(it)
+                result.add(it)
             }
         }
 
