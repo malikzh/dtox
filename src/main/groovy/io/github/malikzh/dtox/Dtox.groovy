@@ -3,20 +3,31 @@ package io.github.malikzh.dtox
 import java.util.Map.Entry
 
 final class Dtox {
-    static List<Object> generate(Class clazz, Closure definition) {
+    static List<Object> generate(Map<String, Object> attributes, Class clazz, Closure definition) {
         Objects.requireNonNull(clazz, 'Class must be not null!')
 
         def delegate = new DtoxDelegate()
         definition.setDelegate(delegate)
         definition.setResolveStrategy(Closure.DELEGATE_ONLY)
+
         definition()
 
-        generateCombinations(delegate.fields.entrySet().toList(), builderFunction())
+        def attrs = defaultAttributes() + attributes
 
-        return []
+        def builder = attrs['builder']
+
+        def result = []
+
+        generateCombinations(clazz, delegate.fields.entrySet().toList()) { cl, data ->
+            builder(cl, data).tap {
+                result.push(it)
+            }
+        }
+
+        return result
     }
 
-    private static void generateCombinations(List<Entry<String, Field>> fields, Closure builder, data = [:]) {
+    private static void generateCombinations(Class clazz, List<Entry<String, Field>> fields, Closure builder, data = [:]) {
         if (fields.isEmpty()) {
             return
         }
@@ -26,9 +37,16 @@ final class Dtox {
         // Closure case
         if (field.value.variants.size() == 1 && field.value.variants[0] instanceof DtoxDelegate) {
             DtoxDelegate delegate = field.value.variants[0] as DtoxDelegate
-            generateCombinations(delegate.fields.entrySet().toList(), { clazz, map ->
-                data[field.key] = builder(null, data)
-                println('subvar: ' + map)
+
+            // Get class from property
+            def fieldClass = getFieldType(clazz, field.key)
+            assert fieldClass != null: "Class '${clazz.name}' doesn't have field '$field.key'"
+
+            def fieldBuilder = field.value.attributes['builder']
+
+            generateCombinations(fieldClass, delegate.fields.entrySet().toList(), { c, map ->
+                data[field.key] = fieldBuilder(c, map)
+                builder(clazz, data)
             })
             return
         }
@@ -38,24 +56,36 @@ final class Dtox {
             data[field.key] = variant
 
             if (fields.size() > 1) {
-                generateCombinations(fields[1..-1], builder, data)
+                generateCombinations(clazz, fields[1..-1], builder, data)
             } else {
-                builder(null, data)
+                builder(clazz, data)
             }
         }
     }
 
-    static def ii = 1
-
     static Closure builderFunction() {
         return { Class clazz, Map<String, Object> data ->
-            println('var: ' + (ii++) + ' ' + data)
-            new Object()
-//            clazz.getDeclaredConstructor().newInstance().tap { obj ->
-//                for (entry in data) {
-//                    obj[entry.key] = entry.value
-//                }
-//            }
+            clazz.getDeclaredConstructor().newInstance().tap { obj ->
+                for (entry in data) {
+                    obj."$entry.key" = entry.value
+                }
+            }
         }
+    }
+
+    static Map<String, Object> defaultAttributes() {
+        return [
+                nullable: false,
+                excludeIf: { obj -> false },
+                builder: builderFunction()
+        ]
+    }
+
+    private static Class getFieldType(Class clazz, String name) {
+        return [*clazz.properties['declaredFields']].find { field ->
+            field.getName() == name
+        }?.with {
+            it.properties['type']
+        } as Class
     }
 }
