@@ -27,6 +27,10 @@ final class Dtox {
         return result
     }
 
+    static List<Object> dtox(Class clazz, Closure definition) {
+        return dtox([:], clazz, definition)
+    }
+
     private static void generateCombinations(Class clazz, List<Entry<String, Field>> fields, Closure builder, data = [:]) {
         if (fields.isEmpty()) {
             return
