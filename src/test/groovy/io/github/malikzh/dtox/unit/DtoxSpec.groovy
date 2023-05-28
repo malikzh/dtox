@@ -261,4 +261,74 @@ class DtoxSpec extends Specification {
         result[3].field1 == 'str2'
         result[3].field2 == 5
     }
+
+    def 'check builder for simple object'() {
+        when:
+        List<SimpleDto> result = dtox(SimpleDto, builder: {a, b -> createSimpleDto(a, b)}) {
+            field1 'str1', 'str2'
+            field2 4, 5
+        }
+
+        then:
+        noExceptionThrown()
+
+        and:
+        result.size() == 4
+
+        and: 'check modified data'
+        result[0].field1 == 's:str1'
+        result[0].field2 == 5 + 4
+
+        result[1].field1 == 's:str1'
+        result[1].field2 == 5 + 5
+
+        result[2].field1 == 's:str2'
+        result[2].field2 == 5 + 4
+
+        result[3].field1 == 's:str2'
+        result[3].field2 == 5 + 5
+    }
+
+    def 'check builder for complex object'() {
+        when:
+        List<ComplexDto> result = dtox(ComplexDto,  builder: {a, b -> createComplexDto(a, b)}) {
+            field1 'a', 'b'
+            field2 (builder: {a, b -> createSimpleDto(a, b)}) {
+                field2 4, 5
+            }
+        }
+
+        then:
+        noExceptionThrown()
+
+        and:
+        result.size() == 4
+
+        and: 'check data'
+        result[0].field1 == 'c:a'
+        result[0].field2.field2 == 5 + 4
+
+        result[1].field1 == 'c:a'
+        result[1].field2.field2 == 5 + 5
+
+        result[2].field1 == 'c:b'
+        result[2].field2.field2 == 5 + 4
+
+        result[3].field1 == 'c:b'
+        result[3].field2.field2 == 5 + 5
+    }
+
+    private SimpleDto createSimpleDto(Class clazz, Map<String, Object> data) {
+        return new SimpleDto().tap {
+            field1 = 's:' + data['field1']
+            field2 = 5 + (data['field2'] as Integer)
+        }
+    }
+
+    private ComplexDto createComplexDto(Class clazz, Map<String, Object> data) {
+        return new ComplexDto().tap {
+            field1 = 'c:' + data['field1']
+            field2 = data['field2'] as SimpleDto
+        }
+    }
 }
