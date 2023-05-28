@@ -33,5 +33,9 @@ test {
 }
 
 jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+
     dependsOn test // tests are required to run before generating the report
 }
