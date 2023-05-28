@@ -17,7 +17,20 @@ DTOs combination generation library written in Groovy.
 
 ## Install
 
-todo...
+Maven:
+```xml
+<dependency>
+  <groupId>io.github.malikzh</groupId>
+  <artifactId>dtox</artifactId>
+  <scope>test</scope>
+</dependency>
+```
+
+Gradle:
+
+```groovy
+testImplementation 'io.github.malikzh:dtox'
+```
 
 ## Example
 
