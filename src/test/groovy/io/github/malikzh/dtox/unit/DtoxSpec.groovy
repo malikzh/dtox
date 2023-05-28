@@ -85,4 +85,27 @@ class DtoxSpec extends Specification {
         result[3].field1 == 'b'
         result[3].field2.field2 == 5
     }
+
+    def 'check with empty fields'() {
+        when:
+        List<ComplexDto> result = dtox(ComplexDto) {
+            field1 'a', 'b'
+            field2 {
+                // none
+            }
+        }
+
+        then:
+        noExceptionThrown()
+
+        and: 'check size'
+        result.size() == 2
+
+        and: 'check data'
+        result[0].field1 == 'a'
+        result[0].field2 != null
+
+        result[1].field1 == 'b'
+        result[1].field2 != null
+    }
 }

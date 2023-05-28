@@ -33,6 +33,7 @@ final class Dtox {
 
     private static void generateCombinations(Class clazz, List<Entry<String, Field>> fields, Closure builder, data = [:]) {
         if (fields.isEmpty()) {
+            builder(clazz, data)
             return
         }
 
