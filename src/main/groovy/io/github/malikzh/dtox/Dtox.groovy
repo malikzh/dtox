@@ -69,6 +69,11 @@ final class Dtox {
                     builder(clazz, data, excludeFunc)
                 }
             })
+
+            if (fields.size() > 1) {
+                generateCombinations(clazz, fields[1..-1], builder, data)
+            }
+
             return
         }
 

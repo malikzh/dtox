@@ -318,6 +318,23 @@ class DtoxSpec extends Specification {
         result[3].field2.field2 == 5 + 5
     }
 
+    def 'check dto filling after nested dto'() {
+        when:
+        List<ComplexDto> result = dtox(ComplexDto) {
+            field2 {
+                field2 4, 5
+            }
+
+            field1 'a', 'b'
+        }
+
+        then:
+        noExceptionThrown()
+
+        and: 'check size'
+        result.size() == 4
+    }
+
     private SimpleDto createSimpleDto(Class clazz, Map<String, Object> data) {
         return new SimpleDto().tap {
             field1 = 's:' + data['field1']
