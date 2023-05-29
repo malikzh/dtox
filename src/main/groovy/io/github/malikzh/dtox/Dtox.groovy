@@ -66,13 +66,14 @@ final class Dtox {
 
                 if (!excludeIf(fieldDto)) {
                     data[field.key] = fieldDto
-                    builder(clazz, data, excludeFunc)
+
+                    if (fields.size() > 1) {
+                        generateCombinations(clazz, fields[1..-1], builder, data)
+                    } else {
+                        builder(clazz, data, excludeFunc)
+                    }
                 }
             })
-
-            if (fields.size() > 1) {
-                generateCombinations(clazz, fields[1..-1], builder, data)
-            }
 
             return
         }

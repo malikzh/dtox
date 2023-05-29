@@ -333,6 +333,19 @@ class DtoxSpec extends Specification {
 
         and: 'check size'
         result.size() == 4
+
+        and: 'check data'
+        result[0].field2.field2 == 4
+        result[0].field1 == 'a'
+
+        result[1].field2.field2 == 4
+        result[1].field1 == 'b'
+
+        result[2].field2.field2 == 5
+        result[2].field1 == 'a'
+
+        result[3].field2.field2 == 5
+        result[3].field1 == 'b'
     }
 
     private SimpleDto createSimpleDto(Class clazz, Map<String, Object> data) {
