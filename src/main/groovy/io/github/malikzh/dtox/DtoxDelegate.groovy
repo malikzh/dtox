@@ -23,7 +23,7 @@ final class DtoxDelegate {
             def delegate = new DtoxDelegate()
             def closure = variants[0] as Closure
 
-            closure.setResolveStrategy(Closure.DELEGATE_ONLY)
+            closure.setResolveStrategy(Closure.DELEGATE_FIRST)
             closure.setDelegate(delegate)
             closure()
 

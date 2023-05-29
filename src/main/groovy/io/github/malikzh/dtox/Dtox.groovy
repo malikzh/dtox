@@ -8,7 +8,7 @@ final class Dtox {
 
         def delegate = new DtoxDelegate()
         definition.setDelegate(delegate)
-        definition.setResolveStrategy(Closure.DELEGATE_ONLY)
+        definition.setResolveStrategy(Closure.DELEGATE_FIRST)
 
         definition()
 
