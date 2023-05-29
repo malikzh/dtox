@@ -1,14 +1,23 @@
 plugins {
     id 'groovy'
     id 'jacoco'
+    id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 group = 'io.github.malikzh'
-version System.getenv('GITHUB_REF_NAME') ? System.getenv('GITHUB_REF_NAME') : '1.0.0-SNAPSHOT'
+version System.getenv('GITHUB_REF_NAME') ? System.getenv('GITHUB_REF_NAME') : '1.0.4'
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    test
 }
 
 dependencies {
@@ -41,20 +50,56 @@ jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        gpr(MavenPublication) {
-            from(components.java)
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'My Library'
+                description = 'A concise description of my library'
+                url = 'http://www.example.com/library'
+
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/malikzh/dtox/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'malikzh'
+                        name = 'Malik Zharykov'
+                        email = 'cmalikz.h@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/malikzh/dtox.git'
+                    developerConnection = 'scm:git:ssh://github.com/malikzh/dtox.git'
+                    url = 'https://github.com/malikzh/dtox'
+                }
+            }
         }
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/malikzh/dtox"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv('OSSRH_USERNAME')
+                password = System.getenv('OSSRH_PASSWORD')
             }
         }
     }
+}
+
+signing {
+    def signingKey = System.getenv('GPG_KEY')
+    def signingPassword = System.getenv('GPG_PASSWORD')
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications['mavenJava']
 }
